@@ -60,12 +60,21 @@ public class DeleteClientAndRefreshCarControllerTest {
     @Test
     public void deleteClientControllerTest() throws Exception {
         logger.info("Start delete client controller test");
-
         mvc.perform(MockMvcRequestBuilders
                 .delete("/clients/"+CLIENT_NAME_GEORGE+"/"+CAR_MODEL_LEXUS))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         assertEquals("Client table should have nothing", 0, clientRepository.findAll().size());
         logger.info("End delete client controller test");
+    }
+
+    @Test
+    public void deleteClientControllerTestWith400Error() throws Exception {
+        logger.info("Start delete client controller test with error");
+        mvc.perform(MockMvcRequestBuilders
+                .delete("/clients/"+CLIENT_NAME_MIKE+"/"+CAR_MODEL_LEXUS))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+        assertEquals("Client table should have one position", 1, clientRepository.findAll().size());
+        logger.info("End delete client controller test with error");
     }
 }
 

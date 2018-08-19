@@ -39,7 +39,6 @@ public class ControllerFunctionalService {
 
     @Transactional
     public ClientDTO createClient(ClientDTO clientDTO) {
-//        if (!clientDTO.getBirthday().matches("\\d{2}\\.\\d{2}\\.\\d{4}")) throw new IllegalArgumentException();
         Optional<Car> ourCars = carRepository.findAllByClientIsNull().stream()
                 .filter(car -> car.getCarModel().equals(clientDTO.getCarModel()) &&
                 car.getReleaseDate().equals(clientDTO.getCarReleaseDate())).findAny();
@@ -63,8 +62,9 @@ public class ControllerFunctionalService {
         Optional<Client> client = clientList.stream()
                 .filter(client1 -> client1.getCar().getCarModel().equals(carModel)).findAny();
 
-        Car car = client.orElseThrow(
-                () -> new IllegalArgumentException("No client found with username " + name)).getCar();
+        if (clientRepository.findClientByName(name).size() == 0) throw new IllegalArgumentException();
+
+        Car car = client.orElseThrow(IllegalArgumentException::new).getCar();
         clientRepository.deleteByNameAndCar(name, car);
         Car carRefreshed = Car.mutator(car)
                 .withClient(null)
